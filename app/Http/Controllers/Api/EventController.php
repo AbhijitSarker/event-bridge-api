@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\EventResource;
 use App\Http\Traits\CanLoadRelationships;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
@@ -15,7 +16,13 @@ class EventController extends Controller
      */
 
     use CanLoadRelationships;
+
     private array $relations = ['user', 'attendees', 'attendees.user'];
+
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
+    }
 
     public function index()
     {
@@ -48,7 +55,7 @@ class EventController extends Controller
                 'start_time' => 'required|date',
                 'end_time' => 'required|date|after:start_time'
             ]),
-            'user_id' => 1
+            'user_id' => $request->user()->id
         ]);
 
         return new EventResource($event);
@@ -59,8 +66,9 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        return new EventResource($this->loadRelationships($event));
-    }
+        return new EventResource(
+            $this->loadRelationships($event)
+        );    }
 
     /**
      * Update the specified resource in storage.
