@@ -53,7 +53,8 @@ class EventController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'start_time' => 'required|date',
-                'end_time' => 'required|date|after:start_time'
+                'end_time' => 'required|date|after:start_time',
+                'location' => 'nullable|string',
             ]),
             'user_id' => $request->user()->id
         ]);
@@ -80,7 +81,8 @@ class EventController extends Controller
                 'name' => 'sometimes|string|max:255',
                 'description' => 'nullable|string',
                 'start_time' => 'sometimes|date',
-                'end_time' => 'sometimes|date|after:start_time'
+                'end_time' => 'sometimes|date|after:start_time',
+                'location' => 'nullable|string',
             ])
         );
 
