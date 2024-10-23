@@ -24,9 +24,23 @@ class EventController extends Controller
         $this->middleware('auth:sanctum')->except(['index', 'show']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $query = $this->loadRelationships(Event::query());
+
+        // Apply search filters
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%");
+                // ->orWhere('location', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Apply date range filter
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('start_time', [$request->input('start_date'), $request->input('end_date')]);
+        }
 
         return EventResource::collection(
             $query->latest()->paginate()
